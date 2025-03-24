@@ -40,13 +40,27 @@
     const userInput = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
 
-    // Function to append messages to the chatbox
+    // ✨ Updated function with cloud badges
     function appendMessage(content, className) {
       const message = document.createElement("div");
       message.className = `message ${className}`;
-      message.textContent = content;
+
+      const lines = content.split("\n");
+      const lastLine = lines[lines.length - 1];
+
+      let badgeHTML = "";
+      if (lastLine.includes("Public Cloud")) {
+        badgeHTML = `<span style="background-color: #d4f4dd; color: green; padding: 2px 6px; border-radius: 6px; font-size: 12px;">☁️ Public Cloud</span>`;
+        lines.pop();
+      } else if (lastLine.includes("Private Cloud")) {
+        badgeHTML = `<span style="background-color: #ffd6d6; color: red; padding: 2px 6px; border-radius: 6px; font-size: 12px;">🔒 Private Cloud</span>`;
+        lines.pop();
+      }
+
+      const baseText = lines.join("<br>");
+      message.innerHTML = `${baseText}<br>${badgeHTML}`;
       chatbox.appendChild(message);
-      chatbox.scrollTop = chatbox.scrollHeight; // Auto-scroll to the bottom
+      chatbox.scrollTop = chatbox.scrollHeight;
     }
 
     // Handle button click
@@ -54,14 +68,10 @@
       const message = userInput.value.trim();
       if (!message) return;
 
-      // Show user message
       appendMessage(message, "user");
-
-      // Clear input
       userInput.value = "";
 
       try {
-        // Send message to the backend
         const response = await fetch("https://aichatbox-74rq.onrender.com/chat", {
           method: "POST",
           headers: {
@@ -73,8 +83,6 @@
         if (!response.ok) throw new Error("Server error");
 
         const data = await response.json();
-
-        // Show AI response
         appendMessage(data.response, "bot");
       } catch (error) {
         appendMessage("Error: Unable to fetch response.", "bot");
