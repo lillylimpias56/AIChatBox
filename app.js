@@ -6,7 +6,10 @@ const path = require("path");
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+  origin: "https://lillylimpias56.github.io"
+}));
+
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
